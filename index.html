@@ -1,126 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rapor</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-      rel="stylesheet"
-    />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rapor</title>
 
-  <body>
-    <div class="container">
-      <h1 class="title"></h1>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet" />
+</head>
 
-      <h3 class="title">Gönderiler</h3>
-      <div class="posts"></div>
+<body>
+  <div class="container">
+    <h1 class="title"></h1>
 
-      <br />
+    <h3 class="title">Gönderiler</h3>
+    <div class="posts"></div>
 
-      <h3 class="title">İstatistikler</h3>
-      <div class="statistics"></div>
-    </div>
-  </body>
+    <br />
 
-  <script
-    data-require="jquery@3.0.0"
-    data-semver="3.0.0"
-    src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.js"
-  ></script>
-  <script>
-    const data = JSON.stringify({
-      id: 10131817224,
-      count: 50,
-      max_id: null,
+    <h3 class="title">İstatistikler</h3>
+    <div class="statistics"></div>
+  </div>
+</body>
+
+<script data-require="jquery@3.0.0" data-semver="3.0.0"
+  src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.js"></script>
+<script>
+  const { ApifyClient } = require('apify-client');
+
+  const client = new ApifyClient({
+    token: 'MY-APIFY-TOKEN',
+  });
+
+  // Starts an actor and waits for it to finish.
+  const { defaultDatasetId } = await client.actor('john-doe/my-cool-actor').call();
+  // Fetches results from the actor's dataset.
+  const { items } = await client.dataset(defaultDatasetId).listItems();
+
+  // apify_api_XMdRcCB8jOtlthH2q4wEWbDpQBE9US3UorM1
+
+  // <div class="post">
+  //   <img src="${media.image_versions2.candidates[1].url}" />
+  //   <div class="post-title"><span>${i + 1}</span> ${media.caption.text}</div>
+  //   <div class="post-date">${date}</div>
+  //   <div class="post-desc">
+  //     Bu gönderi bugüne kadar:
+  //     <ul>
+  //       <li>${media.play_count ? media.play_count.toLocaleString() + " defa izlendi" : "_"}</li>
+  //       <li>${media.play_count ? media.like_count.toLocaleString() + " beğeni aldı" : "_"}</li>
+  //       <li>${media.play_count ? media.comment_count.toLocaleString() + " yorum aldı" : "_"}</li>
+  //       <li>${media.play_count ? media.like_count.toLocaleString() + " paylaşım aldı" : "_"}</li>
+  //     </ul>
+  //   </div>
+  // </div>
+ 
+  // play_count
+  // comment_count
+  // comments
+  // like_count
+  // code
+  // video_versions[0].url
+  // crosspost
+  // caption.text
+  // image_versions2.candidates[0].url
+</script>
+
+<script>
+  const postContainer = document.querySelector(".posts")
+  const statisticsContainer = document.querySelector(".statistics")
+
+  let postsCount = 0
+  let statisticsCount = 0
+
+  fetch("./posts.json")
+    .then((response) => response.json())
+    .then((data) => {
+      postsCount = data.postsCount
+      statisticsCount = data.statisticsCount
+
+      document.querySelector(".title").innerHTML = data.pageTitle
+
+      // createItems(postsCount, statisticsCount, data)
     })
+    .catch((error) => console.log(error))
 
-    const xhr = new XMLHttpRequest()
-    xhr.withCredentials = true
-
-    xhr.addEventListener("readystatechange", function () {
-      if (this.readyState === this.DONE) {
-        const postContainer = document.querySelector(".posts")
-        
-        console.log(this.responseText)
-
-        medias.forEach((media, i) => {
-          let date = new Date(media.device_timestamp).getHours() + "0" + date.getMinutes() + "0" + date.getSeconds()
-
-          postContainer.innerHTML += `
-            <div class="post">
-              <img src="${media.image_versions2.candidates[1].url}" />
-              <div class="post-title"><span>${i + 1}</span> ${media.caption.text}</div>
-              <div class="post-date">${date}</div>
-              <div class="post-desc">
-                Bu gönderi bugüne kadar:
-                <ul>
-                  <li>${media.play_count ? media.play_count.toLocaleString() + " defa izlendi": "_"}</li>
-                  <li>${media.play_count ? media.like_count.toLocaleString() + " beğeni aldı": "_"}</li>
-                  <li>${media.play_count ? media.comment_count.toLocaleString() + " yorum aldı": "_"}</li>
-                  <li>${media.play_count ? media.like_count.toLocaleString() + " paylaşım aldı": "_"}</li>
-                </ul>
-              </div>
-            </div>
-          `
-        })
-
-
-        // play_count
-        // comment_count
-        // comments
-        // like_count
-        // code
-        // video_versions[0].url
-        // crosspost
-        // caption.text
-        // image_versions2.candidates[0].url
-      }
-    })
-
-    xhr.open(
-      "POST",
-      "https://rocketapi-for-instagram.p.rapidapi.com/instagram/user/get_media"
-    )
-    xhr.setRequestHeader("content-type", "application/json")
-    xhr.setRequestHeader(
-      "X-RapidAPI-Key",
-      "caa1eb9b4dmshfb998402f8e0fc5p14219ajsn0b41e56c2d32"
-    )
-    xhr.setRequestHeader(
-      "X-RapidAPI-Host",
-      "rocketapi-for-instagram.p.rapidapi.com"
-    )
-
-    xhr.send(data)
-  </script>
-
-  <script>
-    const postContainer = document.querySelector(".posts")
-    const statisticsContainer = document.querySelector(".statistics")
-
-    let postsCount = 0
-    let statisticsCount = 0
-
-    fetch("./posts.json")
-      .then((response) => response.json())
-      .then((data) => {
-        postsCount = data.postsCount
-        statisticsCount = data.statisticsCount
-
-        document.querySelector(".title").innerHTML = data.pageTitle
-
-        // createItems(postsCount, statisticsCount, data)
-      })
-      .catch((error) => console.log(error))
-
-    const createItems = (postsCount, statisticsCount, data) => {
-      for (let i = 1; i < statisticsCount + 1; i++) {
-        statisticsContainer.innerHTML += `
+  const createItems = (postsCount, statisticsCount, data) => {
+    for (let i = 1; i < statisticsCount + 1; i++) {
+      statisticsContainer.innerHTML += `
             <div class="statistic">
               <img src="/img/istatistik (${i}).png" />
               <div class="statistic-date">27 Ekim</div>
@@ -129,78 +99,88 @@
               </div>
             </div>
           `
-      }
     }
-  </script>
+  }
+</script>
 
-  <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      margin: 0;
-      padding: 0;
-      justify-content: center;
-      align-items: center;
-      font-family: "Montserrat", sans-serif;
-    }
-    .container {
-      margin: auto 0;
-      padding: 40px 0;
-    }
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+    font-family: "Montserrat", sans-serif;
+  }
 
-    .posts,
-    .statistics {
-      display: flex;
-      flex-direction: column;
-      grid-row-gap: 20px;
-    }
-    .post,
-    .statistic {
-      width: 500px;
-      padding: 20px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      background-color: #fff;
-      box-shadow: 0 0 50px -15px rgba(0, 0, 0, 0.5);
-    }
-    .post img,
-    .statistic img {
-      width: 100%;
-      object-fit: contain;
-      border-radius: 6px;
-    }
-    .post-date,
-    .statistic-date {
-      margin-top: 10px;
-      font-weight: 600;
-    }
-    .post-date span,
-    .statistic-date span {
-      font-weight: 700;
-    }
-    .post-desc,
-    .statistic-desc {
-      margin-top: 10px;
-      font-size: 14px;
-      font-weight: 500;
-    }
-    .post-hashtags,
-    .statistic-hashtags {
-      display: flex;
-      grid-gap: 6px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    .post-hashtags span,
-    .statistic-hashtags span {
-      cursor: pointer;
-      font-size: 12px;
-      color: #999;
-      transition: all 0.1s ease-out;
-    }
-    .post-hashtags span:hover,
-    .statistic-hashtags span:hover {
-      color: #666;
-    }
-  </style>
+  .container {
+    margin: auto 0;
+    padding: 40px 0;
+  }
+
+  .posts,
+  .statistics {
+    display: flex;
+    flex-direction: column;
+    grid-row-gap: 20px;
+  }
+
+  .post,
+  .statistic {
+    width: 500px;
+    padding: 20px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 0 50px -15px rgba(0, 0, 0, 0.5);
+  }
+
+  .post img,
+  .statistic img {
+    width: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+
+  .post-date,
+  .statistic-date {
+    margin-top: 10px;
+    font-weight: 600;
+  }
+
+  .post-date span,
+  .statistic-date span {
+    font-weight: 700;
+  }
+
+  .post-desc,
+  .statistic-desc {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .post-hashtags,
+  .statistic-hashtags {
+    display: flex;
+    grid-gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .post-hashtags span,
+  .statistic-hashtags span {
+    cursor: pointer;
+    font-size: 12px;
+    color: #999;
+    transition: all 0.1s ease-out;
+  }
+
+  .post-hashtags span:hover,
+  .statistic-hashtags span:hover {
+    color: #666;
+  }
+</style>
+
 </html>
